@@ -1,0 +1,142 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestão de Estoque</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f1f5f9;
+            padding: 20px;
+        }
+
+        h1 { color: #12471f; }
+
+        input, button {
+            padding: 10px;
+            margin: 5px;
+        }
+
+        button {
+            background: #0a490d;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            background: white;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1> Gestão de Estoque equipe 5 ✨
+
+</h1>
+
+    <h3>Cadastrar matéria-prima</h3>
+
+    <input id="nome" placeholder="Nome do material⚙️">
+    <input id="quantidade" type="number and words" placeholder="Quantidade">
+    <input id="preco" type="number" placeholder="Preço unitário🤑">
+
+    <button onclick="cadastrar()">Cadastrar</button>
+
+    <h3>Materiais cadastrados</h3>
+    <p id="total">Valor do estoque: R$ 00,00</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Material</th>
+                <th>Quantidade</th>
+                <th>Preço</th>
+                
+            </tr>
+        </thead>
+        <tbody id="lista"></tbody>
+    </table>
+
+    <script>
+        let materiais = JSON.parse(
+            localStorage.getItem("estoque")
+        ) || [];
+
+        function cadastrar() {
+            let nome = document.getElementById("nome").value;
+            let quantidade = Number(
+                document.getElementById("quantidade").value
+            );
+            let preco = Number(
+                document.getElementById("preco").value
+            );
+
+            if (!nome || quantidade < 0 || !Number.isFinite(quantidade)
+                || !Number.isFinite(preco) || preco < 0
+                || document.getElementById("quantidade").value === ""
+                || document.getElementById("preco").value === "") {
+                alert("Preencha os campos corretamente!");
+                return;
+            }
+
+            materiais.push({ nome, quantidade, preco });
+
+            localStorage.setItem("estoque", JSON.stringify(materiais));
+
+            document.getElementById("nome").value = "";
+            document.getElementById("quantidade").value = "";
+            document.getElementById("preco").value = "";
+
+            mostrar();
+        }
+
+        function mostrar() {
+            let lista = document.getElementById("lista");
+            lista.innerHTML = "";
+            let total = 0;
+
+            materiais.forEach((m, i) => {
+                total += m.quantidade * m.preco;
+
+                lista.innerHTML += `
+                    <tr>
+                        <td></td>
+                        <td>${m.quantidade}</td>
+                        <td>R$ ${m.preco.toFixed(2)}</td>
+                        <td><button onclick="excluir(${i})">Excluir</button></td>
+                    </tr>`;
+
+                lista.lastElementChild.cells[0].textContent = m.nome;
+            });
+
+            document.getElementById("total").textContent =
+                "Valor do estoque: " +
+                total.toLocaleString("pt-BR", {
+                    style: "currency",
+                    currency: "BRL"
+                });
+        }
+
+        function excluir(i) {
+            materiais.splice(i, 1);
+            localStorage.setItem("estoque", JSON.stringify(materiais));
+            mostrar();
+        }
+
+        mostrar();
+    </script>
+
+</body>
+</html>
